@@ -1,9 +1,8 @@
-import type { NextRequest } from 'next/server';
 import { supabase } from '../lib/supabase';
 
 export const config = { runtime: 'edge' };
 
-export default async function handler(req: NextRequest): Promise<Response> {
+export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'GET') {
     return new Response('Method Not Allowed', { status: 405 });
   }

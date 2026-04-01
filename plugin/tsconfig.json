@@ -5,13 +5,8 @@
     "outDir": "dist",
     "rootDir": "src",
     "module": "commonjs",
-    "target": "ES6",
-    "lib": ["ES6", "DOM"],
-    "jsx": "react",
-    "typeRoots": [
-      "./node_modules/@figma/plugin-typings",
-      "./node_modules/@types"
-    ]
+    "target": "ES6"
   },
+  "references": [{ "path": "../shared" }],
   "include": ["src"]
 }

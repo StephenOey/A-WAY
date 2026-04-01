@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "lib": ["ES6"],
+    "types": ["@figma/plugin-typings"]
+  },
+  "files": ["src/main.ts"],
+  "include": []
+}

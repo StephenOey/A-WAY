@@ -1,11 +1,10 @@
-import type { NextRequest } from 'next/server';
 import { supabase } from '../lib/supabase';
 import { computeExpiresAt } from '../lib/expiry';
 import type { CreateAnnotationInput } from '@a-way/shared';
 
 export const config = { runtime: 'edge' };
 
-export default async function handler(req: NextRequest): Promise<Response> {
+export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') {
     return new Response('Method Not Allowed', { status: 405 });
   }

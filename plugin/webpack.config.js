@@ -13,7 +13,7 @@ module.exports = [
     resolve: { extensions: ['.tsx', '.ts', '.js'] },
     module: {
       rules: [
-        { test: /\.tsx?$/, use: 'ts-loader', exclude: /node_modules/ },
+        { test: /\.tsx?$/, use: { loader: 'ts-loader', options: { configFile: 'tsconfig.ui.json' } }, exclude: /node_modules/ },
         { test: /\.css$/, use: ['style-loader', 'css-loader'] },
       ],
     },
@@ -44,7 +44,7 @@ module.exports = [
     resolve: { extensions: ['.ts', '.js'] },
     module: {
       rules: [
-        { test: /\.ts$/, use: 'ts-loader', exclude: /node_modules/ },
+        { test: /\.ts$/, use: { loader: 'ts-loader', options: { configFile: 'tsconfig.main.json' } }, exclude: /node_modules/ },
       ],
     },
     // Figma sandbox is browser-like but has no window; 'web' is the closest valid target
