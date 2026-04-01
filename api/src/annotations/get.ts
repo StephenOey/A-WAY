@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabase';
 import { embedQuery } from '../lib/voyage';
 import { withCors, preflight } from '../lib/cors';
-import type { Annotation } from '@a-way/shared';
+import type { Annotation } from '../types';
 
 export const config = { runtime: 'edge' };
 

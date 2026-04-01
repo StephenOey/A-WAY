@@ -7,7 +7,6 @@
     "dev": "vercel dev"
   },
   "dependencies": {
-    "@a-way/shared": "*",
     "@supabase/supabase-js": "^2.43.0"
   },
   "devDependencies": {
