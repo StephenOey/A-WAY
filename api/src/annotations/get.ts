@@ -1,12 +1,14 @@
 import { supabase } from '../lib/supabase';
 import { embedQuery } from '../lib/voyage';
+import { withCors, preflight } from '../lib/cors';
 import type { Annotation } from '@a-way/shared';
 
 export const config = { runtime: 'edge' };
 
 export default async function handler(req: Request): Promise<Response> {
+  if (req.method === 'OPTIONS') return preflight();
   if (req.method !== 'GET') {
-    return new Response('Method Not Allowed', { status: 405 });
+    return withCors(new Response('Method Not Allowed', { status: 405 }));
   }
 
   const { searchParams } = new URL(req.url);
@@ -44,7 +46,7 @@ export default async function handler(req: Request): Promise<Response> {
 
       if (error) {
         console.error('keyword search error:', error.message);
-        return new Response('Internal Server Error', { status: 500 });
+        return withCors(new Response('Internal Server Error', { status: 500 }));
       }
       results = (data ?? []) as Annotation[];
     }
@@ -58,13 +60,15 @@ export default async function handler(req: Request): Promise<Response> {
 
     if (error) {
       console.error('select error:', error.message);
-      return new Response('Internal Server Error', { status: 500 });
+      return withCors(new Response('Internal Server Error', { status: 500 }));
     }
     results = (data ?? []) as Annotation[];
   }
 
-  return new Response(JSON.stringify(results), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' },
-  });
+  return withCors(
+    new Response(JSON.stringify(results), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  );
 }

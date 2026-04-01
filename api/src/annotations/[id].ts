@@ -1,10 +1,12 @@
 import { supabase } from '../lib/supabase';
+import { withCors, preflight } from '../lib/cors';
 
 export const config = { runtime: 'edge' };
 
 export default async function handler(req: Request): Promise<Response> {
+  if (req.method === 'OPTIONS') return preflight();
   if (req.method !== 'DELETE') {
-    return new Response('Method Not Allowed', { status: 405 });
+    return withCors(new Response('Method Not Allowed', { status: 405 }));
   }
 
   // Parse id from URL path manually — edge functions don't inject path params.
@@ -13,7 +15,7 @@ export default async function handler(req: Request): Promise<Response> {
   const id = segments[segments.length - 1];
 
   if (!id) {
-    return new Response('Missing id', { status: 400 });
+    return withCors(new Response('Missing id', { status: 400 }));
   }
 
   const { error } = await supabase
@@ -23,8 +25,8 @@ export default async function handler(req: Request): Promise<Response> {
 
   if (error) {
     console.error('delete error:', error.message);
-    return new Response('Internal Server Error', { status: 500 });
+    return withCors(new Response('Internal Server Error', { status: 500 }));
   }
 
-  return new Response(null, { status: 204 });
+  return withCors(new Response(null, { status: 204 }));
 }
