@@ -15,8 +15,17 @@ function getFrameInfo(): { frameId: string; frameLink: string } | null {
   return { frameId, frameLink };
 }
 
-// Send current frame info to UI on load
-figma.ui.postMessage({ type: 'FRAME_INFO', payload: getFrameInfo() });
+// figma.currentUser is null when the plugin runs outside an authenticated session
+const designerId = figma.currentUser?.id ?? figma.currentUser?.name ?? 'unknown-designer';
+
+// Send context to UI on load
+figma.ui.postMessage({
+  type: 'INIT',
+  payload: {
+    frameInfo: getFrameInfo(),
+    designerId,
+  },
+});
 
 // Listen for messages from the UI
 figma.ui.onmessage = (msg: { type: string; payload?: unknown }) => {

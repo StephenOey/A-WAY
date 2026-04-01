@@ -9,13 +9,15 @@ interface FrameInfo {
 
 function App() {
   const [frameInfo, setFrameInfo] = useState<FrameInfo | null>(null);
+  const [designerId, setDesignerId] = useState<string>('');
 
   useEffect(() => {
     window.onmessage = (event: MessageEvent) => {
       const msg = event.data.pluginMessage;
       if (!msg) return;
-      if (msg.type === 'FRAME_INFO') {
-        setFrameInfo(msg.payload ?? null);
+      if (msg.type === 'INIT') {
+        setFrameInfo(msg.payload.frameInfo ?? null);
+        setDesignerId(msg.payload.designerId ?? '');
       }
     };
   }, []);
@@ -23,7 +25,7 @@ function App() {
   return (
     <div style={{ padding: 16, fontFamily: 'Inter, sans-serif' }}>
       <h2 style={{ marginTop: 0 }}>A-WAY Annotation</h2>
-      <AnnotationForm frameInfo={frameInfo} />
+      <AnnotationForm frameInfo={frameInfo} designerId={designerId} />
     </div>
   );
 }

@@ -4,11 +4,12 @@ import { API_URL } from '../constants';
 
 interface Props {
   frameInfo: { frameId: string; frameLink: string } | null;
+  designerId: string;
 }
 
 type SaveState = 'idle' | 'saving' | 'success' | 'error';
 
-export function AnnotationForm({ frameInfo }: Props) {
+export function AnnotationForm({ frameInfo, designerId }: Props) {
   const [note, setNote] = useState('');
   const [status, setStatus] = useState<AnnotationStatus>('draft');
   const [saveState, setSaveState] = useState<SaveState>('idle');
@@ -18,7 +19,7 @@ export function AnnotationForm({ frameInfo }: Props) {
     setSaveState('saving');
 
     const body: CreateAnnotationInput = {
-      designer_id: 'figma-user', // Replace with actual Figma currentUser.id when available
+      designer_id: designerId || 'unknown-designer',
       frame_id: frameInfo.frameId,
       frame_link: frameInfo.frameLink,
       note,
@@ -72,7 +73,7 @@ export function AnnotationForm({ frameInfo }: Props) {
 
       <button
         onClick={handleSave}
-        disabled={saveState === 'saving' || !frameInfo}
+        disabled={saveState === 'saving' || !frameInfo || !note.trim()}
         style={{ width: '100%', padding: '8px 0' }}
       >
         {saveState === 'saving' ? 'Saving…' : 'Save'}
