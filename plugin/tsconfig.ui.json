@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "lib": ["ES6", "DOM"],
+    "jsx": "react",
+    "types": ["node", "react", "react-dom"]
+  },
+  "include": ["src/ui.tsx", "src/components", "src/constants.ts"]
+}

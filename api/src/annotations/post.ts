@@ -1,11 +1,10 @@
-import type { NextRequest } from 'next/server';
 import { supabase } from '../lib/supabase';
-import { computeExpiresAt } from '../lib/expiry';
+import { embed } from '../lib/voyage';
 import type { CreateAnnotationInput } from '@a-way/shared';
 
 export const config = { runtime: 'edge' };
 
-export default async function handler(req: NextRequest): Promise<Response> {
+export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') {
     return new Response('Method Not Allowed', { status: 405 });
   }
@@ -25,10 +24,13 @@ export default async function handler(req: NextRequest): Promise<Response> {
     return new Response('Invalid status value', { status: 400 });
   }
 
-  // expires_at is a generated column in Postgres — do NOT insert it
+  // Generate embedding — null if VOYAGE_API_KEY is absent (graceful degradation)
+  const embedding = await embed(note);
+
+  // expires_at is a generated column — do not insert it
   const { data, error } = await supabase
     .from('annotations')
-    .insert({ designer_id, frame_id, frame_link, note, status })
+    .insert({ designer_id, frame_id, frame_link, note, status, embedding })
     .select()
     .single();
 
