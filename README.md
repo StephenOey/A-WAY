@@ -74,7 +74,7 @@ The API runs locally on `http://localhost:3000` by default. Endpoints:
 | Method | Path | Description |
 |--------|------|-------------|
 | `POST` | `/annotations` | Save a new annotation |
-| `GET` | `/annotations?query=` | Search annotations (stubbed) |
+| `GET` | `/annotations?query=` | Semantic search (Voyage AI) with keyword fallback |
 | `DELETE` | `/annotations/:id` | Remove an annotation |
 
 ### 6. Slack bot
@@ -97,7 +97,7 @@ See `.env.example` for all required keys:
 | `SUPABASE_ANON_KEY` | api | Supabase anon/public key |
 | `SLACK_BOT_TOKEN` | bot | Slack bot OAuth token (`xoxb-…`) |
 | `SLACK_SIGNING_SECRET` | bot | Slack app signing secret |
-| `OPENAI_API_KEY` | api (future) | Reserved for semantic search |
+| `VOYAGE_API_KEY` | api | Voyage AI key for semantic search (`pa-…`) |
 | `NEXT_PUBLIC_API_URL` | plugin, bot | Deployed API base URL |
 | `PORT` | bot | Port for the Slack bot HTTP server |
 
@@ -105,4 +105,4 @@ See `.env.example` for all required keys:
 
 - `expires_at` on annotations is computed automatically by Postgres (30 days from `created_at`). Do not set it from application code.
 - Row-level security is enabled on the `annotations` table. Requests using the anon key are scoped to the authenticated user.
-- Semantic/vector search via OpenAI is stubbed — `GET /annotations?query=` currently performs a case-insensitive `LIKE` filter. Replace with embedding-based retrieval when ready.
+- Semantic search uses Voyage AI (`voyage-3`, 1024-dim vectors) with automatic fallback to case-insensitive keyword search when `VOYAGE_API_KEY` is not set. Apply `supabase/migrations/002_embeddings.sql` to enable pgvector before deploying.
