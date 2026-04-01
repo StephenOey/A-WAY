@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "module": "commonjs",
+    "target": "ES6",
+    "lib": ["ES6", "DOM"],
+    "jsx": "react",
+    "typeRoots": [
+      "./node_modules/@figma/plugin-typings",
+      "./node_modules/@types"
+    ]
+  },
+  "include": ["src"]
+}

@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "routes": [
+    { "src": "/annotations", "methods": ["POST"], "dest": "/src/annotations/post.ts" },
+    { "src": "/annotations", "methods": ["GET"],  "dest": "/src/annotations/get.ts"  },
+    { "src": "/annotations/([^/]+)", "methods": ["DELETE"], "dest": "/src/annotations/[id].ts" }
+  ]
+}
