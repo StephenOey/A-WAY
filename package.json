@@ -1,0 +1,15 @@
+{
+  "name": "a-way",
+  "version": "0.0.1",
+  "private": true,
+  "workspaces": ["shared", "plugin", "api", "bot"],
+  "scripts": {
+    "build:shared": "npm run build -w shared",
+    "build:plugin": "npm run build -w plugin",
+    "build:api": "npm run build -w api",
+    "build:bot": "npm run build -w bot",
+    "build": "npm run build:shared && npm run build:plugin && npm run build:api && npm run build:bot",
+    "dev:bot": "npm run dev -w bot",
+    "dev:plugin": "npm run dev -w plugin"
+  }
+}

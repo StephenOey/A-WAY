@@ -1,0 +1,17 @@
+{
+  "name": "@a-way/api",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@a-way/shared": "*",
+    "@supabase/supabase-js": "^2.43.0"
+  },
+  "devDependencies": {
+    "@vercel/edge": "^1.1.0",
+    "typescript": "^5.4.0"
+  }
+}

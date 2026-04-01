@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node"
+  },
+  "references": [
+    { "path": "./shared" },
+    { "path": "./plugin" },
+    { "path": "./api" },
+    { "path": "./bot" }
+  ]
+}
