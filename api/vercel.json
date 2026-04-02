@@ -1,10 +1,4 @@
 {
-  "functions": {
-    "src/annotations/get.ts":  { "runtime": "edge" },
-    "src/annotations/post.ts": { "runtime": "edge" },
-    "src/annotations/[id].ts": { "runtime": "edge" },
-    "src/cron/purge.ts":       { "runtime": "edge" }
-  },
   "routes": [
     { "src": "/annotations",          "methods": ["POST",   "OPTIONS"], "dest": "/src/annotations/post.ts" },
     { "src": "/annotations",          "methods": ["GET",    "OPTIONS"], "dest": "/src/annotations/get.ts"  },
