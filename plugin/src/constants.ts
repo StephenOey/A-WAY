@@ -3,4 +3,4 @@
 export const API_URL =
   typeof process !== 'undefined' && process.env.NEXT_PUBLIC_API_URL
     ? process.env.NEXT_PUBLIC_API_URL
-    : 'https://your-vercel-deployment.vercel.app';
+    : 'https://a-way.vercel.app';

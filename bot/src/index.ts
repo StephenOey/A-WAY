@@ -9,94 +9,134 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
-// ── Shared helpers ─────────────────────────────────────────────────
+// ── Query parsing ──────────────────────────────────────────────────
+// Supports optional prefixes in the query:
+//   designer:<figma_user_id>   — filter by designer
+//   frame:<figma_frame_id>     — filter by frame_id
+// Example: "designer:U123 frame:456 nav bar height"
+interface ParsedQuery {
+  query: string;
+  designerId?: string;
+  frameId?: string;
+}
 
-async function fetchAnnotations(query: string): Promise<Annotation[]> {
-  const url = `${API_URL}/annotations?query=${encodeURIComponent(query)}`;
+function parseQuery(raw: string): ParsedQuery {
+  let text = raw.trim();
+  let designerId: string | undefined;
+  let frameId: string | undefined;
+
+  const designerMatch = text.match(/\bdesigner:(\S+)/i);
+  if (designerMatch) {
+    designerId = designerMatch[1];
+    text = text.replace(designerMatch[0], '').trim();
+  }
+
+  const frameMatch = text.match(/\bframe:(\S+)/i);
+  if (frameMatch) {
+    frameId = frameMatch[1];
+    text = text.replace(frameMatch[0], '').trim();
+  }
+
+  return { query: text, designerId, frameId };
+}
+
+// ── API fetch ──────────────────────────────────────────────────────
+async function fetchAnnotations(parsed: ParsedQuery): Promise<Annotation[]> {
+  const params = new URLSearchParams();
+  if (parsed.query)      params.set('query',       parsed.query);
+  if (parsed.designerId) params.set('designer_id', parsed.designerId);
+  if (parsed.frameId)    params.set('frame_id',    parsed.frameId);
+
+  const url = `${API_URL}/annotations?${params.toString()}`;
   const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
   if (!res.ok) throw new Error(`API returned ${res.status}`);
   return res.json() as Promise<Annotation[]>;
 }
 
-function formatReply(annotations: Annotation[], query: string): string {
+// ── Response formatter ─────────────────────────────────────────────
+function formatReply(annotations: Annotation[], parsed: ParsedQuery): string {
+  const filters: string[] = [];
+  if (parsed.query)      filters.push(`_"${parsed.query}"_`);
+  if (parsed.designerId) filters.push(`designer: \`${parsed.designerId}\``);
+  if (parsed.frameId)    filters.push(`frame: \`${parsed.frameId}\``);
+
   const header =
-    ':robot_face: *A-WAY — AI-generated response*\n' +
-    `> Query: _${query}_\n\n`;
+    ':mag: *A-WAY search*\n' +
+    (filters.length > 0 ? `> ${filters.join('  ·  ')}\n\n` : '\n');
 
   if (annotations.length === 0) {
-    return (
-      header +
-      "No matching annotations found. The designer may not have left notes on this yet, or try rephrasing your question."
-    );
+    return header + 'No matching annotations found. Try rephrasing your query or check the filters.';
   }
 
-  const lines = annotations.slice(0, 5).map((a, i) => {
-    const tag = a.designer_id.startsWith('U') ? `<@${a.designer_id}>` : `*${a.designer_id}*`;
+  const shown = annotations.slice(0, 8);
+  const lines = shown.map((a, i) => {
+    const designer = a.designer_id.startsWith('U') ? `<@${a.designer_id}>` : `*${a.designer_id}*`;
+    const tags = (a.tags ?? []).length > 0
+      ? `  \`${a.tags.join('\`  \`')}\``
+      : '';
     return (
-      `${i + 1}. *Frame:* <${a.frame_link}|Open in Figma>  |  Designer: ${tag}\n` +
+      `${i + 1}. <${a.frame_link}|Open in Figma>  ·  ${designer}${tags}\n` +
       `   > ${a.note}`
     );
   });
 
-  const footer =
-    annotations.length > 5
-      ? `\n_…and ${annotations.length - 5} more result(s). Narrow your query for better results._`
-      : '';
+  const footer = annotations.length > 8
+    ? `\n_…and ${annotations.length - 8} more result(s). Narrow your query for better results._`
+    : '';
 
   return header + lines.join('\n\n') + footer;
 }
 
-// ── app_mention handler ────────────────────────────────────────────
+// ── Shared handler ─────────────────────────────────────────────────
+async function handleQuery(rawText: string, say: (msg: { text: string; thread_ts?: string }) => Promise<unknown>, threadTs?: string) {
+  const parsed = parseQuery(rawText);
 
-app.event('app_mention', async ({ event, say }) => {
-  const mentionEvent = event as AppMentionEvent;
-  const query = mentionEvent.text.replace(/<@[A-Z0-9]+>/g, '').trim();
-
-  if (!query) {
+  if (!parsed.query && !parsed.designerId && !parsed.frameId) {
     await say({
-      text: ':wave: Hi! Ask me anything about a design decision, e.g. _@away what is the nav bar height?_',
-      thread_ts: mentionEvent.ts,
+      text: ':wave: Hi! Ask me anything about a design decision.\n' +
+            'Examples:\n' +
+            '• `@away what is the nav bar height?`\n' +
+            '• `@away designer:U123 spacing`\n' +
+            '• `/away frame:abc123 colors`',
+      thread_ts: threadTs,
     });
     return;
   }
 
   try {
-    const annotations = await fetchAnnotations(query);
-    await say({ text: formatReply(annotations, query), thread_ts: mentionEvent.ts });
+    const annotations = await fetchAnnotations(parsed);
+    await say({ text: formatReply(annotations, parsed), thread_ts: threadTs });
   } catch (err) {
-    console.error('app_mention error:', err);
+    console.error('query error:', err);
     await say({
       text: ':warning: *A-WAY* could not reach the annotation service. Please try again later.',
-      thread_ts: mentionEvent.ts,
+      thread_ts: threadTs,
     });
   }
+}
+
+// ── app_mention handler ────────────────────────────────────────────
+app.event('app_mention', async ({ event, say }) => {
+  const e = event as AppMentionEvent;
+  const rawText = e.text.replace(/<@[A-Z0-9]+>/g, '').trim();
+  await handleQuery(rawText, say, e.ts);
 });
 
 // ── Direct message handler ─────────────────────────────────────────
-
 app.message(async ({ message, say }) => {
   const dm = message as GenericMessageEvent;
-
-  // Only handle plain DMs (no bot messages, no thread replies to keep things clean)
   if (dm.channel_type !== 'im') return;
   if ('subtype' in dm && dm.subtype) return;
+  await handleQuery(dm.text?.trim() ?? '', say, dm.ts);
+});
 
-  const query = dm.text?.trim() ?? '';
-  if (!query) return;
-
-  try {
-    const annotations = await fetchAnnotations(query);
-    await say({ text: formatReply(annotations, query), thread_ts: dm.ts });
-  } catch (err) {
-    console.error('DM handler error:', err);
-    await say({
-      text: ':warning: *A-WAY* could not reach the annotation service. Please try again later.',
-    });
-  }
+// ── /away slash command ────────────────────────────────────────────
+app.command('/away', async ({ command, ack, say }) => {
+  await ack();
+  await handleQuery(command.text.trim(), say);
 });
 
 // ── Start ──────────────────────────────────────────────────────────
-
 (async () => {
   const port = Number(process.env.PORT ?? 3000);
   await app.start(port);

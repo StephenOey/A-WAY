@@ -2,8 +2,9 @@
   "version": 2,
   "outputDirectory": ".",
   "routes": [
-    { "src": "/annotations",          "methods": ["POST", "OPTIONS"], "dest": "/src/annotations/post.ts" },
-    { "src": "/annotations",          "methods": ["GET",  "OPTIONS"], "dest": "/src/annotations/get.ts"  },
+    { "src": "/annotations",          "methods": ["POST",   "OPTIONS"], "dest": "/src/annotations/post.ts" },
+    { "src": "/annotations",          "methods": ["GET",    "OPTIONS"], "dest": "/src/annotations/get.ts"  },
+    { "src": "/annotations/([^/]+)",  "methods": ["PUT",    "OPTIONS"], "dest": "/src/annotations/[id].ts" },
     { "src": "/annotations/([^/]+)",  "methods": ["DELETE", "OPTIONS"], "dest": "/src/annotations/[id].ts" }
   ],
   "crons": [

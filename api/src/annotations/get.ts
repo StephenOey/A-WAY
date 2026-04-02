@@ -12,12 +12,37 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const { searchParams } = new URL(req.url);
-  const query = searchParams.get('query')?.trim() ?? '';
+  const query      = searchParams.get('query')?.trim() ?? '';
+  const frameId    = searchParams.get('frame_id')?.trim() ?? '';
+  const designerId = searchParams.get('designer_id')?.trim() ?? '';
 
   let results: Annotation[] = [];
 
+  // ── Frame or designer filter (skip semantic search) ──────────────
+  if (frameId || designerId) {
+    let q = supabase.from('annotations').select('*');
+
+    if (frameId)    q = q.eq('frame_id', frameId);
+    if (designerId) q = q.eq('designer_id', designerId);
+    if (query)      q = q.ilike('note', `%${query}%`);
+
+    const { data, error } = await q;
+    if (error) {
+      console.error('filter query error:', error.message);
+      return withCors(new Response('Internal Server Error', { status: 500 }));
+    }
+    results = (data ?? []) as Annotation[];
+
+    return withCors(
+      new Response(JSON.stringify(results), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+  }
+
+  // ── Semantic / keyword search ─────────────────────────────────────
   if (query) {
-    // Attempt semantic vector search first (requires VOYAGE_API_KEY)
     const queryEmbedding = await embedQuery(query);
 
     if (queryEmbedding) {
@@ -29,13 +54,11 @@ export default async function handler(req: Request): Promise<Response> {
 
       if (error) {
         console.error('vector search error:', error.message);
-        // Fall through to keyword search
       } else {
         results = (data ?? []) as Annotation[];
       }
     }
 
-    // Fallback: keyword search when embedding is unavailable or RPC fails
     if (results.length === 0) {
       const { data, error } = await supabase
         .from('annotations')
@@ -51,7 +74,7 @@ export default async function handler(req: Request): Promise<Response> {
       results = (data ?? []) as Annotation[];
     }
   } else {
-    // No query — return all active, non-expired annotations
+    // No filters at all — return all active non-expired annotations
     const { data, error } = await supabase
       .from('annotations')
       .select('*')

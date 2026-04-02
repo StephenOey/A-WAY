@@ -7,6 +7,7 @@ export interface Annotation {
   frame_link: string;
   note: string;
   status: AnnotationStatus;
-  created_at: string;
-  expires_at: string;
+  tags: string[];
+  created_at: string; // ISO 8601
+  expires_at: string; // ISO 8601
 }

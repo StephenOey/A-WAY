@@ -1,6 +1,6 @@
 {
   "name": "A-WAY",
-  "id": "a-way-plugin-001",
+  "id": "REPLACE_WITH_FIGMA_PLUGIN_ID",
   "api": "1.0.0",
   "main": "dist/main.js",
   "ui": "dist/ui.html",
