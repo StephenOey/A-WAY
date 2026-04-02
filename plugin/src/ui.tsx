@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { AnnotationForm } from './components/AnnotationForm';
 import { AnnotationList } from './components/AnnotationList';
-import type { Annotation } from '@a-way/shared';
+import type { Annotation } from './types';
 import './styles.css';
 
 interface FrameInfo { frameId: string; frameLink: string; }

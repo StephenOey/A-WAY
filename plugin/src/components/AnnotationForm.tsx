@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import type { CreateAnnotationInput, AnnotationStatus, Annotation, ExpiryDays } from '@a-way/shared';
+import type { CreateAnnotationInput, AnnotationStatus, Annotation, ExpiryDays } from '../types';
 import { API_URL } from '../constants';
 
 interface Props {

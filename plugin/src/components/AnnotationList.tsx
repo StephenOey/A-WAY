@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import type { Annotation } from '@a-way/shared';
+import type { Annotation } from '../types';
 import { API_URL } from '../constants';
 
 interface Props {
