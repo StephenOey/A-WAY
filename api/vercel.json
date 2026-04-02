@@ -1,13 +1,11 @@
 {
-  "routes": [
-    { "src": "/annotations",          "methods": ["POST",   "OPTIONS"], "dest": "/src/annotations/post.ts" },
-    { "src": "/annotations",          "methods": ["GET",    "OPTIONS"], "dest": "/src/annotations/get.ts"  },
-    { "src": "/annotations/([^/]+)",  "methods": ["PUT",    "OPTIONS"], "dest": "/src/annotations/[id].ts" },
-    { "src": "/annotations/([^/]+)",  "methods": ["DELETE", "OPTIONS"], "dest": "/src/annotations/[id].ts" }
+  "rewrites": [
+    { "source": "/annotations",        "destination": "/api/annotations" },
+    { "source": "/annotations/:id",    "destination": "/api/annotations/:id" }
   ],
   "crons": [
     {
-      "path": "/src/cron/purge.ts",
+      "path": "/api/cron/purge",
       "schedule": "0 3 * * *"
     }
   ]
