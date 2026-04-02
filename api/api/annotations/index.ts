@@ -41,14 +41,14 @@ export default async function handler(req: Request): Promise<Response> {
       }
       if (results.length === 0) {
         const { data, error } = await supabase.from('annotations').select('*')
-          .eq('status', 'active').gt('expires_at', new Date().toISOString())
+          .gt('expires_at', new Date().toISOString())
           .ilike('note', `%${query}%`);
         if (error) return withCors(new Response('Internal Server Error', { status: 500 }));
         results = (data ?? []) as Annotation[];
       }
     } else {
       const { data, error } = await supabase.from('annotations').select('*')
-        .eq('status', 'active').gt('expires_at', new Date().toISOString());
+        .gt('expires_at', new Date().toISOString());
       if (error) return withCors(new Response('Internal Server Error', { status: 500 }));
       results = (data ?? []) as Annotation[];
     }

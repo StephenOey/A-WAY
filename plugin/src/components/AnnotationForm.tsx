@@ -20,7 +20,7 @@ const EXPIRY_OPTIONS: { label: string; value: ExpiryDays }[] = [
 
 export function AnnotationForm({ frameInfo, designerId, editingAnnotation, onCancelEdit, onSaved }: Props) {
   const [note,       setNote]       = useState('');
-  const [status,     setStatus]     = useState<AnnotationStatus>('draft');
+  const [status,     setStatus]     = useState<AnnotationStatus>('active');
   const [tags,       setTags]       = useState<string[]>([]);
   const [tagInput,   setTagInput]   = useState('');
   const [expiryDays, setExpiryDays] = useState<ExpiryDays>(30);
@@ -38,7 +38,7 @@ export function AnnotationForm({ frameInfo, designerId, editingAnnotation, onCan
       setSaveState('idle');
     } else {
       setNote('');
-      setStatus('draft');
+      setStatus('active');
       setTags([]);
       setExpiryDays(30);
       setSaveState('idle');
