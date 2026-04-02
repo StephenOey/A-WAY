@@ -21,14 +21,13 @@ module.exports = [
       new HtmlWebpackPlugin({
         template: './src/ui.html',
         filename: 'ui.html',
-        // Inline the JS so the plugin works as a single HTML file
         inject: 'body',
         scriptLoading: 'blocking',
       }),
       // Inject API URL at build time — process.env is unavailable in the Figma sandbox
       new webpack.DefinePlugin({
         'process.env.NEXT_PUBLIC_API_URL': JSON.stringify(
-          process.env.NEXT_PUBLIC_API_URL || ''
+          process.env.NEXT_PUBLIC_API_URL || 'https://a-way.vercel.app'
         ),
       }),
     ],
