@@ -1,6 +1,6 @@
 import { App } from '@slack/bolt';
 import type { AppMentionEvent, GenericMessageEvent } from '@slack/bolt';
-import type { Annotation } from '@a-way/shared';
+import type { Annotation } from './types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
 
