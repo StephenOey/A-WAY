@@ -95,9 +95,9 @@ async function handleQuery(rawText: string, say: (msg: { text: string; thread_ts
     await say({
       text: ':wave: Hi! Ask me anything about a design decision.\n' +
             'Examples:\n' +
-            '• `@away what is the nav bar height?`\n' +
-            '• `@away designer:U123 spacing`\n' +
-            '• `/away frame:abc123 colors`',
+            '• `/a-way nav bar height`\n' +
+            '• `/a-way designer:U123 spacing`\n' +
+            '• `/a-way frame:abc123 colors`',
       thread_ts: threadTs,
     });
     return;
@@ -131,7 +131,7 @@ app.message(async ({ message, say }) => {
 });
 
 // ── /away slash command ────────────────────────────────────────────
-app.command('/away', async ({ command, ack, say }) => {
+app.command('/a-way', async ({ command, ack, say }) => {
   await ack();
   await handleQuery(command.text.trim(), say);
 });
