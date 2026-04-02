@@ -10,8 +10,7 @@ create table public.annotations (
   note         text not null,
   status       text not null check (status in ('active', 'draft')),
   created_at   timestamptz not null default now(),
-  expires_at   timestamptz not null
-                 generated always as (created_at + interval '30 days') stored
+  expires_at   timestamptz not null default (now() + interval '30 days')
 );
 
 -- ── Row-level security ───────────────────────────────────────────────────────
